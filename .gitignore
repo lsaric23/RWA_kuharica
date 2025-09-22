@@ -1,0 +1,47 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Production build outputs
+dist/
+build/
+tmp/
+temp/
+
+# Environment files (sadrže lozinke, API ključeve, itd.)
+.env
+.env.*.local
+
+# Logs
+logs/
+*.log
+*.log.*
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# IDE / Editor datoteke
+.vscode/
+.idea/
+*.swp
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Angular specific
+frontend/.angular/cache/
+frontend/.angular/
+frontend/coverage/
+frontend/.nyc_output/
+
+# NestJS specific (ako buildaš u dist/)
+backend/dist/
+backend/.nestjs/
+
+# Uploads (ako koristiš lokalno spremanje slika)
+uploads/
