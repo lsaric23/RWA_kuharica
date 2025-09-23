@@ -1,0 +1,7 @@
+<h2>Registracija</h2>
+<form (ngSubmit)="register()">
+  <input [(ngModel)]="username" name="username" placeholder="Korisničko ime" required>
+  <input [(ngModel)]="email" name="email" placeholder="Email" required>
+  <input [(ngModel)]="password" name="password" type="password" placeholder="Lozinka" required>
+  <button type="submit">Registracija</button>
+</form>

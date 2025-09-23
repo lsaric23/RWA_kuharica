@@ -1,0 +1,11 @@
+<nav>
+  <a routerLink="/">Recepti</a>
+  <a routerLink="/collections" *ngIf="token">Moje kolekcije</a>
+  <a routerLink="/login" *ngIf="!token">Prijava</a>
+  <a routerLink="/register" *ngIf="!token">Registracija</a>
+  <a href="#" *ngIf="token" (click)="logout()">Odjava</a>
+</nav>
+
+<div class="container">
+  <router-outlet></router-outlet>
+</div>
