@@ -14,6 +14,7 @@ temp/
 # Environment files (sadrže lozinke, API ključeve, itd.)
 .env
 .env.*.local
+.env.example
 
 # Logs
 logs/

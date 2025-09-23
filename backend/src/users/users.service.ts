@@ -1,16 +1,14 @@
 import { Injectable, ConflictException } from '@nestjs/common';
-import { RedisService } from '../redis/redis.service';
+import { RedisService } from 'src/redis/redis.service';
 import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(private redis: RedisService) {}
-
   private client() { return this.redis.getClient(); }
 
   async create({ username, email, password }: { username: string; email: string; password: string }) {
-    // check index users:by:username
     const client = this.client();
     const existing = await client.get(`users:by:username:${username}`);
     if (existing) throw new ConflictException('Username already exists');
@@ -23,16 +21,12 @@ export class UsersService {
   }
 
   async findById(id: string) {
-    const client = this.client();
-    const u = await client.hgetall(`user:${id}`);
-    if (!u || Object.keys(u).length === 0) return null;
-    return u;
+    const u = await this.client().hgetall(`user:${id}`);
+    return Object.keys(u).length ? u : null;
   }
 
   async findByUsername(username: string) {
-    const client = this.client();
-    const id = await client.get(`users:by:username:${username}`);
-    if (!id) return null;
-    return this.findById(id);
+    const id = await this.client().get(`users:by:username:${username}`);
+    return id ? this.findById(id) : null;
   }
 }

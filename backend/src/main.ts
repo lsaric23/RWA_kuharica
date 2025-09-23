@@ -11,7 +11,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
-  // static serve for local uploads
+  // Static za lokalne uploadove
   const uploadPath = process.env.UPLOAD_LOCAL_PATH || './uploads';
   if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
   app.useStaticAssets(path.resolve(uploadPath), { prefix: '/uploads/' });

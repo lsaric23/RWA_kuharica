@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { RedisService } from '../redis/redis.service';
+import { RedisService } from 'src/redis/redis.service';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
-import { UsersService } from '../users/users.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -11,7 +11,6 @@ export class AuthService {
   private client() { return this.redis.getClient(); }
 
   async register(username: string, email: string, password: string) {
-    // create user through UsersService (which uses Redis)
     const user = await this.usersService.create({ username, email, password });
     return { id: user.id, username: user.username, email: user.email };
   }
@@ -20,8 +19,7 @@ export class AuthService {
     const user = await this.usersService.findByUsername(username);
     if (!user) return null;
     const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) return null;
-    return user;
+    return ok ? user : null;
   }
 
   async login(username: string, password: string) {
@@ -29,7 +27,6 @@ export class AuthService {
     if (!user) throw new UnauthorizedException('Invalid credentials');
     const token = uuidv4();
     await this.client().set(`session:${token}`, user.id);
-    // optionally set TTL: await client().set(`session:${token}`, user.id, 'EX', 86400);
     return { token, user: { id: user.id, username: user.username, email: user.email } };
   }
 

@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { RedisModule } from './redis/redis.module';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { RecipesModule } from './recipes/recipes.module';
-import { UploadModule } from './upload/upload.module';
+import { RedisModule } from 'src/redis/redis.module';
+import { AuthModule } from 'src/auth/auth.module';
+import { UsersModule } from 'src/users/users.module';
+import { RecipesModule } from 'src/recipes/recipes.module';
+import { UploadModule } from 'src/upload/upload.module';
+import { CommentsModule } from 'src/comments/comments.module';
+import { CollectionsModule } from 'src/collections/collections.module';
 
 @Module({
   imports: [
@@ -12,8 +14,8 @@ import { UploadModule } from './upload/upload.module';
     UsersModule,
     RecipesModule,
     UploadModule,
+    CommentsModule,
+    CollectionsModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}
