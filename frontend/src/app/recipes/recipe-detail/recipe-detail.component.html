@@ -1,0 +1,7 @@
+<h2>{{recipe?.title}}</h2>
+<p>{{recipe?.instructions}}</p>
+<div *ngIf="recipe?.images?.length">
+  <img *ngFor="let img of recipe.images" [src]="img" style="max-width:200px">
+</div>
+
+<app-comment-list [recipeId]="recipe?.id"></app-comment-list>

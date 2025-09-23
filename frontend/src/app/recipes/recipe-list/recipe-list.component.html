@@ -1,0 +1,7 @@
+<h2>Recepti</h2>
+<a routerLink="/recipes/new" *ngIf="localStorage.getItem('token')">Dodaj recept</a>
+<ul>
+  <li *ngFor="let r of recipes">
+    <a [routerLink]="['/recipes', r.id]">{{r.title}}</a>
+  </li>
+</ul>
