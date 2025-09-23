@@ -1,0 +1,5 @@
+<h2>Moje kolekcije</h2>
+<a routerLink="/collections/new">Nova kolekcija</a>
+<ul>
+  <li *ngFor="let c of collections">{{c.name}}</li>
+</ul>
