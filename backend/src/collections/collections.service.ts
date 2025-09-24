@@ -1,45 +1,43 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { RedisService } from '../redis/redis.service';
+import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+
+interface Collection {
+  id: string;
+  userId: string;
+  name: string;
+  recipes: string[];
+}
 
 @Injectable()
 export class CollectionsService {
-  constructor(private redis: RedisService) {}
-  private client() { return this.redis.getClient(); }
+  private collections: Collection[] = [];
 
-  async createCollection(userId: string, name: string) {
-    const id = uuidv4();
-    await this.client().hmset(`collection:${id}`, { id, name, ownerId: userId });
-    await this.client().sadd(`user:${userId}:collections`, id);
-    return { id, name, ownerId: userId };
+  createCollection(userId: string, name: string): Collection {
+    const newCollection: Collection = {
+      id: uuidv4(),
+      userId,
+      name,
+      recipes: [],
+    };
+    this.collections.push(newCollection);
+    return newCollection;
   }
 
-  async addRecipe(collectionId: string, recipeId: string, userId: string) {
-    const col = await this.client().hgetall(`collection:${collectionId}`);
-    if (!col || Object.keys(col).length === 0) throw new NotFoundException('Collection not found');
-    if (col.ownerId !== userId) throw new ForbiddenException('Not your collection');
-
-    const recipe = await this.client().hgetall(`recipe:${recipeId}`);
-    if (!recipe || Object.keys(recipe).length === 0) throw new NotFoundException('Recipe not found');
-
-    await this.client().sadd(`collection:${collectionId}:recipes`, recipeId);
-    return { collectionId, recipeId };
-  }
-
-  async getCollection(collectionId: string) {
-    const col = await this.client().hgetall(`collection:${collectionId}`);
-    if (!col || Object.keys(col).length === 0) throw new NotFoundException('Collection not found');
-    const recipeIds = await this.client().smembers(`collection:${collectionId}:recipes`);
-    return { ...col, recipes: recipeIds };
-  }
-
-  async getUserCollections(userId: string) {
-    const ids = await this.client().smembers(`user:${userId}:collections`);
-    const result = [];
-    for (const id of ids) {
-      const c = await this.client().hgetall(`collection:${id}`);
-      if (Object.keys(c).length) result.push(c);
+  addRecipe(collectionId: string, recipeId: string, userId: string): Collection | undefined {
+    const collection = this.collections.find(
+      (c) => c.id === collectionId && c.userId === userId,
+    );
+    if (collection) {
+      collection.recipes.push(recipeId);
     }
-    return result;
+    return collection;
+  }
+
+  getCollection(id: string): Collection | undefined {
+    return this.collections.find((c) => c.id === id);
+  }
+
+  getUserCollections(userId: string): Collection[] {
+    return this.collections.filter((c) => c.userId === userId);
   }
 }

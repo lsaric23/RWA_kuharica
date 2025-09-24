@@ -1,68 +1,66 @@
-import { Controller, Post, UseInterceptors, UploadedFiles, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UploadedFiles,
+  UseInterceptors,
+  Req,
+} from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import * as multer from 'multer';
-import * as path from 'path';
-import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { S3Client } from '@aws-sdk/client-s3';
 import * as multerS3 from 'multer-s3';
 import * as dotenv from 'dotenv';
+import * as path from 'path';
+import * as multer from 'multer';
+import { Express } from 'express';
+
 dotenv.config();
 
-const uploadDriver = process.env.UPLOAD_DRIVER || 'local';
-const localUploadPath = process.env.UPLOAD_LOCAL_PATH || './uploads';
+const region = process.env.AWS_REGION || 'us-east-1';
+const accessKeyId = process.env.AWS_ACCESS_KEY_ID || '';
+const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY || '';
 
-if (!fs.existsSync(localUploadPath)) fs.mkdirSync(localUploadPath, { recursive: true });
+const client = new S3Client({
+  region,
+  credentials: {
+    accessKeyId,
+    secretAccessKey,
+  },
+});
 
-function localStorage() {
-  return multer.diskStorage({
-    destination: (req, file, cb) => cb(null, localUploadPath),
-    filename: (req, file, cb) => {
-      const ext = path.extname(file.originalname);
-      cb(null, `${Date.now()}-${uuidv4()}${ext}`);
-    },
-  });
-}
-
-function s3Storage() {
-  const bucket = process.env.S3_BUCKET;
-  const region = process.env.S3_REGION;
-  const client = new S3Client({
-    region,
-    credentials: {
-      accessKeyId: process.env.S3_ACCESS_KEY_ID,
-      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-    },
-  });
-  return multerS3({
-    s3: client as any,
-    bucket,
-    acl: 'public-read',
+const upload = multer({
+  storage: multerS3({
+    s3: client,
+    bucket: process.env.AWS_BUCKET_NAME || 'my-bucket',
     key: (req, file, cb) => {
-      const ext = path.extname(file.originalname);
-      cb(null, `${Date.now()}-${uuidv4()}${ext}`);
+      const fileName = uuidv4() + path.extname(file.originalname);
+      cb(null, fileName);
     },
-  } as any);
-}
+  }),
+});
 
 @Controller('upload')
 export class UploadController {
   @Post()
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
-    storage: uploadDriver === 's3' ? s3Storage() : localStorage()
-  }))
-  upload(@UploadedFiles() files: { images?: Express.Multer.File[] }, @Req() req) {
-    const uploaded = [];
-    if (!files || !files.images) return { urls: [] };
-    for (const f of files.images) {
-      const anyf: any = f;
-      if (anyf.location) uploaded.push(anyf.location);
-      else {
-        const host = req.headers.host || 'localhost:3000';
-        const url = `${req.protocol}://${host}/uploads/${anyf.filename}`;
-        uploaded.push(url);
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], { storage: upload.storage }))
+  upload(
+    @UploadedFiles() files: { images?: Express.Multer.File[] },
+    @Req() req: any,
+  ) {
+    const uploaded: string[] = [];
+
+    if (files.images) {
+      for (const anyf of files.images) {
+        const f = anyf as any;
+        if (f.location) {
+          uploaded.push(f.location);
+        }
       }
     }
-    return { urls: uploaded };
+
+    const url = `${req.protocol}://${req.get('host')}/uploads/example.jpg`;
+    uploaded.push(url);
+
+    return { uploaded };
   }
 }

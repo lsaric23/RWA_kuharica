@@ -1,23 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
-import * as fs from 'fs';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import * as path from 'path';
-import * as dotenv from 'dotenv';
-dotenv.config();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  const uploadPath = path.join(__dirname, '..', 'uploads');
+  app.useStaticAssets(uploadPath, { prefix: '/uploads/' });
 
-  // Static za lokalne uploadove
-  const uploadPath = process.env.UPLOAD_LOCAL_PATH || './uploads';
-  if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
-  app.useStaticAssets(path.resolve(uploadPath), { prefix: '/uploads/' });
-
-  const port = process.env.PORT ? Number(process.env.PORT) : 3000;
-  await app.listen(port);
-  console.log(`Backend listening on http://localhost:${port}`);
+  await app.listen(3000);
 }
 bootstrap();

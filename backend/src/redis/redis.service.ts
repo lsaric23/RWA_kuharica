@@ -1,24 +1,29 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
 import * as dotenv from 'dotenv';
+
 dotenv.config();
 
 @Injectable()
-export class RedisService implements OnModuleInit, OnModuleDestroy {
-  private client: Redis.Redis;
+export class RedisService {
+  private client: Redis;
 
-  onModuleInit() {
-    const host = process.env.REDIS_HOST || '127.0.0.1';
-    const port = Number(process.env.REDIS_PORT) || 6379;
-    this.client = new Redis({ host, port });
-    this.client.on('error', (err) => console.error('Redis error', err));
+  constructor() {
+    this.client = new Redis({
+      host: process.env.REDIS_HOST || '127.0.0.1',
+      port: Number(process.env.REDIS_PORT) || 6379,
+    });
   }
 
   getClient() {
     return this.client;
   }
 
-  async onModuleDestroy() {
-    await this.client.quit();
+  async set(key: string, value: string) {
+    await this.client.set(key, value);
+  }
+
+  async get(key: string) {
+    return this.client.get(key);
   }
 }

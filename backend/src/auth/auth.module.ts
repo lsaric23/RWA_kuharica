@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { RedisModule } from 'src/redis/redis.module';
-import { UsersModule } from 'src/users/users.module';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Module({
-  imports: [RedisModule, UsersModule],
-  providers: [AuthService],
   controllers: [AuthController],
+  providers: [AuthService, JwtAuthGuard],
   exports: [AuthService],
 })
 export class AuthModule {}
