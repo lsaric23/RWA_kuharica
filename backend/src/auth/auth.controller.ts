@@ -1,14 +1,15 @@
-import { Controller, Post, Body, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './jwt-auth.guard'; 
+import { UserDto } from '../dto/UserDto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() body: { username: string; password: string }) {
-    return this.authService.register(body.username, body.password);
+  async register(@Body() body: { username: string; password: string; email?: string }): Promise<UserDto> {
+    const user = await this.authService.register(body.username, body.password, body.email);
+    return { id: user.id, username: user.username, email: user.email };
   }
 
   @Post('login')
@@ -16,9 +17,10 @@ export class AuthController {
     return this.authService.login(body.username, body.password);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('me')
-  async me(@Req() req: any) {
-    return this.authService.validateUser(req.user.userId);
+  @Post('validate')
+  async validate(@Req() req: any): Promise<UserDto | undefined> {
+    const user = await this.authService.validateUser(req.userId);
+    if (!user) return undefined;
+    return { id: user.id, username: user.username, email: user.email };
   }
 }

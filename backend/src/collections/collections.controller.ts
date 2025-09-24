@@ -1,38 +1,50 @@
-import {
-  Controller,
-  Post,
-  Param,
-  Get,
-  Body,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Body, Param, Req, Get } from '@nestjs/common';
 import { CollectionsService } from './collections.service';
+import { CollectionDto } from 'src/dto/CollectionDto';
 
 @Controller('collections')
 export class CollectionsController {
-  constructor(private readonly svc: CollectionsService) {}
+  constructor(private readonly collectionsService: CollectionsService) {}
 
   @Post()
-  createCollection(@Req() req: any, @Body() body: { name: string }) {
-    return this.svc.createCollection(req.userId, body.name);
+  async createCollection(@Req() req: any, @Body() body: { name: string }): Promise<CollectionDto> {
+    const collection = await this.collectionsService.createCollection(body.name, req.userId);
+    return {
+      id: collection.id,
+      name: collection.name,
+      recipes: collection.recipes || [],
+    };
   }
 
-  @Post(':id/recipes/:recipeId')
-  addRecipe(
-    @Param('id') id: string,
-    @Param('recipeId') recipeId: string,
-    @Req() req: any,
-  ) {
-    return this.svc.addRecipe(id, recipeId, req.userId);
+  @Post(':id/recipes')
+  async addRecipe(@Param('id') id: string, @Body() body: { recipeId: string }, @Req() req: any): Promise<CollectionDto | null> {
+    const collection = await this.collectionsService.addRecipe(id, body.recipeId, req.userId);
+    if (!collection) return null;
+    return {
+      id: collection.id,
+      name: collection.name,
+      recipes: collection.recipes || [],
+    };
   }
 
   @Get(':id')
-  getCollection(@Param('id') id: string) {
-    return this.svc.getCollection(id);
+  async getCollection(@Param('id') id: string): Promise<CollectionDto | null> {
+    const collection = await this.collectionsService.getCollection(id);
+    if (!collection) return null;
+    return {
+      id: collection.id,
+      name: collection.name,
+      recipes: collection.recipes || [],
+    };
   }
 
-  @Get()
-  getUserCollections(@Req() req: any) {
-    return this.svc.getUserCollections(req.userId);
+  @Get('user')
+  async getUserCollections(@Req() req: any): Promise<CollectionDto[]> {
+    const collections = await this.collectionsService.getUserCollections(req.userId);
+    return collections.map(c => ({
+      id: c.id,
+      name: c.name,
+      recipes: c.recipes || [],
+    }));
   }
 }

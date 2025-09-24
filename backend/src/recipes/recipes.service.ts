@@ -21,15 +21,16 @@ export class RecipesService {
     return this.recipes.find((r) => r.id === id);
   }
 
-  create(userId: string, recipeData: { title: string; description: string }): Recipe {
-    const newRecipe: Recipe = {
-      id: uuidv4(),
-      userId,
-      ...recipeData,
-    };
-    this.recipes.push(newRecipe);
-    return newRecipe;
-  }
+  create(title: string, description: string, userId: string) {
+  const newRecipe = {
+    id: (this.recipes.length + 1).toString(),
+    title,
+    description,
+    userId,
+  };
+  this.recipes.push(newRecipe);
+  return newRecipe;
+}
 
   delete(id: string, userId: string): boolean {
     const index = this.recipes.findIndex(

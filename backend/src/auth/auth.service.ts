@@ -1,69 +1,41 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
-import { RedisService } from '../redis/redis.service';
+import { Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
+
+interface User {
+  id: string;
+  username: string;
+  password: string;
+  email?: string;
+}
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly redis: RedisService) {}
+  private readonly jwtSecret = process.env.JWT_SECRET as string;
+  private users: User[] = [];
 
-  private client() {
-    return this.redis.getClient();
+  async register(username: string, password: string, email?: string): Promise<User> {
+    const newUser: User = { id: (this.users.length + 1).toString(), username, password, email };
+    this.users.push(newUser);
+    return newUser;
   }
 
-  async register(username: string, password: string) {
-    const hashed = await bcrypt.hash(password, 10);
-    const userId = uuidv4();
-
-    await this.client().hmset(`user:${userId}`, {
-      username,
-      password: hashed,
-    });
-
-    return { userId, username };
+  async login(username: string, password: string): Promise<{ token: string }> {
+    const user = this.users.find(u => u.username === username && u.password === password);
+    if (!user) throw new Error('Invalid credentials');
+    const token = jwt.sign({ userId: user.id }, this.jwtSecret, { expiresIn: '1h' });
+    return { token };
   }
 
-  async login(username: string, password: string) {
-    // Nađi usera u Redis
-    const keys = await this.client().keys('user:*');
-    let foundUserId: string | null = null;
-    let userData: any = null;
-
-    for (const key of keys) {
-      const data = await this.client().hgetall(key);
-      if (data.username === username) {
-        foundUserId = key.split(':')[1];
-        userData = data;
-        break;
-      }
-    }
-
-    if (!foundUserId || !userData) {
-      throw new UnauthorizedException('User not found');
-    }
-
-    // Provjeri password
-    const valid = await bcrypt.compare(password, userData.password);
-    if (!valid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    // Generiraj JWT
-    const token = jwt.sign(
-      { userId: foundUserId, username },
-      process.env.JWT_SECRET || 'super_secret_key',
-      { expiresIn: process.env.JWT_EXPIRES_IN || '3600s' },
-    );
-
-    return { access_token: token };
+  async validateUser(userId: string): Promise<User | undefined> {
+    return this.users.find(u => u.id === userId);
   }
 
-  async validateUser(userId: string) {
-    const data = await this.client().hgetall(`user:${userId}`);
-    if (!data || !data.username) {
-      return null;
+  async getUserIdByToken(token: string): Promise<string> {
+    try {
+      const decoded = jwt.verify(token, this.jwtSecret) as { userId: string };
+      return decoded.userId;
+    } catch {
+      throw new Error('Invalid token');
     }
-    return { userId, username: data.username };
   }
 }
