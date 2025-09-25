@@ -1,16 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ApiService } from '../../services/api.service';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { CommentListComponent } from 'src/app/comments/comment-list/comment-list.component';
 
 @Component({
   selector: 'app-recipe-detail',
+  standalone: true,
+  imports: [CommonModule, CommentListComponent],
   templateUrl: './recipe-detail.component.html'
 })
-export class RecipeDetailComponent implements OnInit {
-  recipe: any;
-  constructor(private route: ActivatedRoute, private api: ApiService) {}
-  ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id')!;
-    this.api.getRecipe(id).subscribe(r => this.recipe = r);
-  }
+export class RecipeDetailComponent {
+  recipe = {
+    id: 1,
+    title: 'Pasta Carbonara',
+    images: ['https://via.placeholder.com/150']
+  };
 }

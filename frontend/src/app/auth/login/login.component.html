@@ -1,6 +1,4 @@
-<h2>Prijava</h2>
-<form (ngSubmit)="login()">
-  <input [(ngModel)]="username" name="username" placeholder="Korisničko ime" required>
-  <input [(ngModel)]="password" name="password" type="password" placeholder="Lozinka" required>
-  <button type="submit">Prijava</button>
-</form>
+<h2>Login</h2>
+<input [(ngModel)]="username" name="username" placeholder="Korisničko ime">
+<input [(ngModel)]="password" type="password" name="password" placeholder="Lozinka">
+<button (click)="login()">Prijava</button>

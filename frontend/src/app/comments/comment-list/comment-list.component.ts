@@ -1,24 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ApiService } from '../../services/api.service';
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-comment-list',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './comment-list.component.html'
 })
-export class CommentListComponent implements OnInit {
-  @Input() recipeId!: string;
-  comments: any[] = [];
-  text = '';
-
-  constructor(private api: ApiService) {}
-
-  ngOnInit() { this.load(); }
-  load() { this.api.getComments(this.recipeId).subscribe(c => this.comments = c); }
-  add() {
-    if (!this.text.trim()) return;
-    this.api.addComment(this.recipeId, this.text).subscribe(() => {
-      this.text = '';
-      this.load();
-    });
-  }
+export class CommentListComponent {
+  @Input() recipeId!: number; 
+  comments = ['Odličan recept!', 'Isprobano i super.'];
 }

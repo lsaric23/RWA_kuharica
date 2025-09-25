@@ -1,8 +1,5 @@
-<h2>Novi recept</h2>
-<form (ngSubmit)="submit()">
-  <input [(ngModel)]="title" name="title" placeholder="Naslov" required>
-  <textarea [(ngModel)]="instructions" name="instructions" placeholder="Upute"></textarea>
-  <input [(ngModel)]="ingredients" name="ingredients" placeholder='["jaje", "brašno"]'>
-  <input type="file" (change)="onFileChange($event)" multiple>
-  <button type="submit">Spremi</button>
-</form>
+<h2>Novi Recept</h2>
+<input [(ngModel)]="title" name="title" placeholder="Naslov" required>
+<textarea [(ngModel)]="instructions" name="instructions" placeholder="Upute"></textarea>
+<input [(ngModel)]="ingredients" name="ingredients" placeholder="Sastojci">
+<button (click)="create()">Spremi</button>

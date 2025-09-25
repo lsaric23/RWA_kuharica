@@ -1,14 +1,11 @@
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { AppRoutingModule } from './app-routing.module';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html'
+  standalone: true,
+  imports: [RouterModule, AppRoutingModule],
+  template: `<router-outlet></router-outlet>` 
 })
-export class AppComponent {
-  get token() {
-    return localStorage.getItem('token');
-  }
-  logout() {
-    localStorage.removeItem('token');
-  }
-}
+export class App {}

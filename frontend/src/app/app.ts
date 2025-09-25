@@ -1,13 +1,16 @@
-import {Component} from '@angular/core';
+import { Component } from '@angular/core';
+import { AppRoutingModule } from './app-routing.module';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  standalone: true,
+  imports: [RouterModule, AppRoutingModule],
   template: `
-    <h1>Default</h1>
+    <router-outlet></router-outlet>
   `,
-  styleUrls: ['./app.css'],
+  styleUrls: ['./app.component.css']
 })
 export class App {
-  title = 'default';
+  title = 'kuharica';
 }

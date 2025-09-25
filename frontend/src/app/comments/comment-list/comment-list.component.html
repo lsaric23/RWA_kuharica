@@ -1,7 +1,4 @@
+<h3>Komentari</h3>
 <ul>
-  <li *ngFor="let c of comments">{{c.text}} — {{c.authorId}}</li>
+ <li *ngFor="let c of comments">{{c}}</li>
 </ul>
-<div *ngIf="localStorage.getItem('token')">
-  <input [(ngModel)]="text" placeholder="Komentar">
-  <button (click)="add()">Pošalji</button>
-</div>
