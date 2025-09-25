@@ -1,35 +1,41 @@
 import { Injectable } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import * as bcrypt from 'bcrypt';
 
-interface User {
+export interface User {
   id: string;
   username: string;
   password: string;
+  email?: string;
 }
 
 @Injectable()
 export class UsersService {
   private users: User[] = [];
 
-  async createUser(username: string, password: string): Promise<User> {
-    const user: User = {
-      id: uuidv4(),
+  async create(username: string, password: string, email?: string): Promise<User> {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser: User = {
+      id: (this.users.length + 1).toString(),
       username,
-      password, 
+      password: hashedPassword,
+      email,
     };
-    this.users.push(user);
-    return user;
+
+    this.users.push(newUser);
+    return newUser;
   }
 
+  
   async findByUsername(username: string): Promise<User | undefined> {
-    return this.users.find((u) => u.username === username);
+    return this.users.find(user => user.username === username);
   }
 
+  
   async findById(id: string): Promise<User | undefined> {
-    return this.users.find((u) => u.id === id);
+    return this.users.find(user => user.id === id);
   }
 
-  async findAll(): Promise<User[]> {
-    return this.users;
+  async findAll(): Promise<Omit<User, 'password'>[]> {
+    return this.users.map(({ password, ...rest }) => rest);
   }
 }

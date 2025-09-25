@@ -1,29 +1,28 @@
-import { Injectable } from '@nestjs/common';
-import Redis from 'ioredis';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import { Inject, Injectable } from '@nestjs/common';
+import { Redis } from 'ioredis';
 
 @Injectable()
 export class RedisService {
-  private client: Redis;
+  constructor(@Inject('REDIS') private readonly redisClient: Redis) {}
 
-  constructor() {
-    this.client = new Redis({
-      host: process.env.REDIS_HOST || '127.0.0.1',
-      port: Number(process.env.REDIS_PORT) || 6379,
-    });
+  async set(key: string, value: any, ttlSeconds?: number): Promise<void> {
+    if (ttlSeconds) {
+      await this.redisClient.set(key, JSON.stringify(value), 'EX', ttlSeconds);
+    } else {
+      await this.redisClient.set(key, JSON.stringify(value));
+    }
   }
 
-  getClient() {
-    return this.client;
+  async get<T>(key: string): Promise<T | null> {
+    const value = await this.redisClient.get(key);
+    return value ? (JSON.parse(value) as T) : null;
   }
 
-  async set(key: string, value: string) {
-    await this.client.set(key, value);
+  async del(key: string): Promise<void> {
+    await this.redisClient.del(key);
   }
 
-  async get(key: string) {
-    return this.client.get(key);
+  getClient(): Redis {
+    return this.redisClient;
   }
 }

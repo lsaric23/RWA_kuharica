@@ -1,14 +1,19 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import * as path from 'path';
+import { Module } from '@nestjs/common';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { RecipesModule } from './recipes/recipes.module';
+import { CollectionsModule } from './collections/collections.module';
+import { UploadController } from './upload/upload.controller';
+
+@Module({
+  imports: [AuthModule, UsersModule, RecipesModule, CollectionsModule],
+  controllers: [UploadController],
+})
+class AppModule {}
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
-  const uploadPath = path.join(__dirname, '..', 'uploads');
-  app.useStaticAssets(uploadPath, { prefix: '/uploads/' });
-
+  const app = await NestFactory.create(AppModule);
   await app.listen(3000);
 }
 bootstrap();

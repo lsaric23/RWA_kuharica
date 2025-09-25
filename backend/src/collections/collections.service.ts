@@ -1,43 +1,63 @@
 import { Injectable } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import { RedisService } from '../redis/redis.service';
+import { RecipesService, Recipe } from '../recipes/recipes.service';
 
-interface Collection {
+export interface Collection {
   id: string;
-  userId: string;
   name: string;
-  recipes: string[];
+  userId: string;
+  recipes: Recipe[];
 }
 
 @Injectable()
 export class CollectionsService {
   private collections: Collection[] = [];
 
-  createCollection(userId: string, name: string): Collection {
+  constructor(
+    private readonly redis: RedisService,
+    private readonly recipesService: RecipesService,
+  ) {}
+
+  async createCollection(name: string, userId: string): Promise<Collection> {
     const newCollection: Collection = {
-      id: uuidv4(),
-      userId,
+      id: (this.collections.length + 1).toString(),
       name,
+      userId,
       recipes: [],
     };
     this.collections.push(newCollection);
+
+    await this.redis.set(`collection:${newCollection.id}`, JSON.stringify(newCollection));
+
     return newCollection;
   }
 
-  addRecipe(collectionId: string, recipeId: string, userId: string): Collection | undefined {
-    const collection = this.collections.find(
-      (c) => c.id === collectionId && c.userId === userId,
-    );
-    if (collection) {
-      collection.recipes.push(recipeId);
-    }
+
+  async addRecipe(collectionId: string, recipeId: string, userId: string): Promise<Collection | undefined> {
+    const collection = this.collections.find(c => c.id === collectionId && c.userId === userId);
+    if (!collection) return undefined;
+
+    const recipe = await this.recipesService.findOne(recipeId);
+    if (!recipe) return undefined;
+
+    collection.recipes.push(recipe);
+
+    await this.redis.set(`collection:${collection.id}`, JSON.stringify(collection));
+
     return collection;
   }
 
-  getCollection(id: string): Collection | undefined {
-    return this.collections.find((c) => c.id === id);
+ 
+  async getCollection(id: string): Promise<Collection | undefined> {
+  const cached = await this.redis.get<string>(`collection:${id}`);
+  if (cached) {
+    return JSON.parse(cached) as Collection;
   }
+  return this.collections.find(c => c.id === id);
+}
 
-  getUserCollections(userId: string): Collection[] {
-    return this.collections.filter((c) => c.userId === userId);
+  
+  async getUserCollections(userId: string): Promise<Collection[]> {
+    return this.collections.filter(c => c.userId === userId);
   }
 }

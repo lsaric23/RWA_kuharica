@@ -1,21 +1,25 @@
 import { Module } from '@nestjs/common';
-import { RedisModule } from 'src/redis/redis.module';
-import { AuthModule } from 'src/auth/auth.module';
-import { UsersModule } from 'src/users/users.module';
-import { RecipesModule } from 'src/recipes/recipes.module';
-import { UploadModule } from 'src/upload/upload.module';
-import { CommentsModule } from 'src/comments/comments.module';
-import { CollectionsModule } from 'src/collections/collections.module';
+import { ConfigModule } from '@nestjs/config';
+import { UsersModule } from './users/users.module';
+import { RecipesModule } from './recipes/recipes.module';
+import { CollectionsModule } from './collections/collections.module';
+import { AuthModule } from './auth/auth.module';
+import { UploadModule } from './upload/upload.module';
+import { RedisModule } from './redis/redis.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
-    RedisModule,
-    AuthModule,
+    ConfigModule.forRoot({ isGlobal: true }), 
     UsersModule,
     RecipesModule,
-    UploadModule,
-    CommentsModule,
     CollectionsModule,
+    AuthModule,
+    UploadModule,
+    RedisModule,
+    CommentsModule,
   ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

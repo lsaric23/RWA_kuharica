@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { CommentsService } from 'src/comments/comments.service';
-import { CommentsController } from 'src/comments/comments.controller';
+import { CommentsService } from './comments.service';
+import { CommentsController } from './comments.controller';
 import { RedisModule } from '../redis/redis.module';
-import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [RedisModule, AuthModule],
-  providers: [CommentsService],
+  imports: [RedisModule],
   controllers: [CommentsController],
+  providers: [CommentsService],
+  exports: [CommentsService],
 })
 export class CommentsModule {}

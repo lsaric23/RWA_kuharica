@@ -8,7 +8,7 @@ export class UploadController {
   @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 10 }]))
   uploadFiles(@UploadedFiles() files: { images?: Express.Multer.File[] }) {
     return {
-      uploaded: files.images?.map(file => file.filename) || [],
+      uploaded: files.images?.map(f => f.filename) || [],
     };
   }
 }

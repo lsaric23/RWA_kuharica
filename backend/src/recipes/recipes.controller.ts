@@ -1,6 +1,6 @@
-import { Controller, Get, Param, Post, Body, Req } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Req } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
-import { RecipeDto } from 'src/dto/RecipeDto';
+import { RecipeDto } from '../dto/RecipeDto';
 
 @Controller('recipes')
 export class RecipesController {
@@ -17,9 +17,10 @@ export class RecipesController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<RecipeDto | null> {
+  async findOne(@Param('id') id: string): Promise<RecipeDto | undefined> {
     const recipe = await this.recipesService.findOne(id);
-    if (!recipe) return null;
+    if (!recipe) return undefined;
+
     return {
       id: recipe.id,
       title: recipe.title,

@@ -1,19 +1,21 @@
-import { Controller, Post, Get, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Req } from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { AuthGuard } from '../auth/auth.guard';
 
-@Controller('recipes/:recipeId/comments')
+@Controller('comments')
 export class CommentsController {
-  constructor(private svc: CommentsService) {}
+  constructor(private readonly commentsService: CommentsService) {}
 
-  @UseGuards(AuthGuard)
-  @Post()
-  addComment(@Req() req, @Param('recipeId') recipeId: string, @Body() body: { text: string }) {
-    return this.svc.addComment(recipeId, req.userId, body.text);
+  @Post(':recipeId')
+  async addComment(
+    @Param('recipeId') recipeId: string,
+    @Req() req: any,
+    @Body() body: { text: string },
+  ) {
+    return this.commentsService.addComment(recipeId, req.userId, body.text);
   }
 
-  @Get()
-  getComments(@Param('recipeId') recipeId: string) {
-    return this.svc.getComments(recipeId);
+  @Get(':recipeId')
+  async getComments(@Param('recipeId') recipeId: string) {
+    return this.commentsService.getComments(recipeId);
   }
 }
