@@ -1,11 +1,14 @@
-<nav>
-  <a routerLink="/">Recepti</a>
-  <a routerLink="/collections" *ngIf="token">Moje kolekcije</a>
-  <a routerLink="/login" *ngIf="!token">Prijava</a>
-  <a routerLink="/register" *ngIf="!token">Registracija</a>
-  <a href="#" *ngIf="token" (click)="logout()">Odjava</a>
-</nav>
+<header>
+  <h1>Kuharica</h1>
+  <nav>
+    <a routerLink="/">Recepti</a>
+    <a routerLink="/recipes/new">Dodaj recept</a>
+    <a routerLink="/collections">Kolekcije</a>
+    <a routerLink="/login">Prijava</a>
+    <a routerLink="/register">Registracija</a>
+  </nav>
+</header>
 
-<div class="container">
+<main>
   <router-outlet></router-outlet>
-</div>
+</main>

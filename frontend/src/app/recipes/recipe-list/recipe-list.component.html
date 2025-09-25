@@ -1,7 +1,6 @@
-<h2>Recepti</h2>
-<a routerLink="/recipes/new" *ngIf="token">Dodaj novi recept</a>
+<h2>Lista recepata</h2>
 <ul>
   <li *ngFor="let r of recipes">
-    <a [routerLink]="['/recipes', r.id]">{{r.title}}</a>
+    <a [routerLink]="['/recipes', r.id]">{{ r.title }}</a>
   </li>
 </ul>

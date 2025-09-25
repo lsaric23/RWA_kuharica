@@ -1,5 +1,4 @@
-<h2>{{recipe?.title}}</h2>
-<div *ngIf="recipe?.images?.length">
-  <img *ngFor="let img of recipe.images" [src]="img" style="max-width:200px; margin-right:5px;">
-</div>
-<app-comment-list [recipeId]="recipe.id!"></app-comment-list>
+<h2>{{ recipe?.title }}</h2>
+<p>{{ recipe?.description }}</p>
+
+<app-comment-list [recipeId]="recipe.id"></app-comment-list>

@@ -10,11 +10,7 @@ import { RouterModule } from '@angular/router';
 })
 export class RecipeListComponent {
   recipes = [
-    { id: 1, title: 'Pasta Carbonara' },
-    { id: 2, title: 'Pizza Margherita' },
+    { id: 1, title: 'Palačinke' },
+    { id: 2, title: 'Pizza' }
   ];
-
-  get token() {
-    return localStorage.getItem('token');
-  }
 }

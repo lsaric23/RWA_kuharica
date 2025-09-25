@@ -1,4 +1,13 @@
 <h3>Komentari</h3>
 <ul>
- <li *ngFor="let c of comments">{{c}}</li>
+  <li *ngFor="let comment of comments">
+    <strong>{{ comment.author }}:</strong> {{ comment.text }}
+  </li>
 </ul>
+
+<h4>Dodaj komentar</h4>
+<form (ngSubmit)="addComment()">
+  <input [(ngModel)]="newAuthor" name="author" placeholder="Vaše ime" required />
+  <textarea [(ngModel)]="newText" name="text" placeholder="Vaš komentar" required></textarea>
+  <button type="submit">Pošalji</button>
+</form>

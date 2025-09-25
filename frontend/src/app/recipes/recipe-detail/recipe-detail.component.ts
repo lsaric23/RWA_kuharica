@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CommentListComponent } from 'src/app/comments/comment-list/comment-list.component';
+import { CommentListComponent } from '../../comments/comment-list/comment-list.component';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -9,9 +9,11 @@ import { CommentListComponent } from 'src/app/comments/comment-list/comment-list
   templateUrl: './recipe-detail.component.html'
 })
 export class RecipeDetailComponent {
+  @Input() recipeId!: number;
+
   recipe = {
     id: 1,
-    title: 'Pasta Carbonara',
-    images: ['https://via.placeholder.com/150']
+    title: 'Primjer recepta',
+    description: 'Ovdje ide opis recepta'
   };
 }

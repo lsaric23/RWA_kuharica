@@ -1,5 +1,17 @@
-<h2>Novi Recept</h2>
-<input [(ngModel)]="title" name="title" placeholder="Naslov" required>
-<textarea [(ngModel)]="instructions" name="instructions" placeholder="Upute"></textarea>
-<input [(ngModel)]="ingredients" name="ingredients" placeholder="Sastojci">
-<button (click)="create()">Spremi</button>
+<h2>Novi recept</h2>
+
+<form (ngSubmit)="saveRecipe()">
+  <label>
+    Naslov:
+    <input [(ngModel)]="title" name="title" required />
+  </label>
+  <br />
+
+  <label>
+    Upute:
+    <textarea [(ngModel)]="instructions" name="instructions" required></textarea>
+  </label>
+  <br />
+
+  <button type="submit">Spremi</button>
+</form>

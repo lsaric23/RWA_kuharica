@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-recipe-create',
@@ -11,9 +12,15 @@ import { FormsModule } from '@angular/forms';
 export class RecipeCreateComponent {
   title = '';
   instructions = '';
-  ingredients = '';
 
-  create() {
-    console.log('Novi recept:', this.title, this.instructions, this.ingredients);
+  constructor(private router: Router) {}
+
+  saveRecipe() {
+    console.log('Spremljeni recept:', {
+      title: this.title,
+      instructions: this.instructions
+    });
+
+    this.router.navigate(['/']);
   }
 }
